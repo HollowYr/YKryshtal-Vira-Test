@@ -8,13 +8,14 @@ public class TrajectoryPrediction : Singleton<TrajectoryPrediction>
     [SerializeField] private LineRenderer lr;
     [SerializeField] private int trajectoryPointsCount = 100;
     // Trajectory
+    public GameObject mainObject;
+    public GameObject plane;
+    
     private Scene parallelScene;
     private PhysicsScene2D parallelPhysicsScene;
 
-    public GameObject mainObject;
-    public GameObject plane;
-
     private bool mainPhysics = true;
+    private static float forceClamp = 4f;
 
     void Start()
     {

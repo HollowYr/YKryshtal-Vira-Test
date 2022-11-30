@@ -275,7 +275,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.9231824, y: 0.603}
   m_EdgeRadius: 0
 --- !u!114 &8086065132372797171
 MonoBehaviour:
@@ -291,10 +291,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ballInBasketMoveTime: 0.5
   ballEase: 27
-  lr: {fileID: 1208050107}
-  trajectoryPointsCount: 100
-  mainObject: {fileID: 0}
-  plane: {fileID: 0}
 --- !u!120 &1208050107
 LineRenderer:
   m_ObjectHideFlags: 0

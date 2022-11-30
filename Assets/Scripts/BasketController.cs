@@ -9,39 +9,19 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 {
     [SerializeField] private float ballInBasketMoveTime = .5f;
     [SerializeField] private Ease ballEase = Ease.OutBack;
-    //[SerializeField] private LineRenderer lr;
-    //[SerializeField] private int trajectoryPointsCount = 100;
-    //[SerializeField] private TrajectoryPrediction TrajectoryPrediction;
+
     private Rigidbody2D ball_Rigidbody;
     private Transform ball_Transform;
     private Vector2 startPos, endPos;
     private float distance;
     private bool clicked = false;
+    private float forceClamp = 6f;
+    private float clampValue;
+    private Vector2 force;
+    private void Start()
+    {
 
-    //// Trajectory
-    //private Scene parallelScene;
-    //private PhysicsScene2D parallelPhysicsScene;
-
-    //public GameObject mainObject;
-    //public GameObject plane;
-
-    //private bool mainPhysics = true;
-    //void Start()
-    //{
-    //    Physics2D.simulationMode = SimulationMode2D.Script;
-    //    lr.positionCount = trajectoryPointsCount;
-
-    //    CreateSceneParameters createSceneParameters = new CreateSceneParameters(LocalPhysicsMode.Physics2D);
-    //    parallelScene = SceneManager.CreateScene("ParallelScene", createSceneParameters);
-    //    parallelPhysicsScene = parallelScene.GetPhysicsScene2D();
-    //}
-
-    //void FixedUpdate()
-    //{
-    //    if (!mainPhysics) return;
-
-    //    SceneManager.GetActiveScene().GetPhysicsScene2D().Simulate(Time.fixedDeltaTime);
-    //}
+    }
     void Update()
     {
         if (ball_Transform == null || clicked == false) return;
@@ -50,54 +30,19 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             endPos = Input.mousePosition;
             distance = Vector2.Distance(startPos, endPos);
+
             Vector2 direction = endPos - startPos;
             RotateInDirection2D(direction);
 
             direction *= -1;
-
-            TrajectoryPrediction.Instance.SimulatePhysics(ball_Rigidbody, direction * (distance / Screen.height) * 10f);
-
-            //FirstProjection(direction);
-            //Debug.Log("Distance: " + distance);
+            force = direction * (distance / Screen.height) * 2f;
+            clampValue = Screen.height / forceClamp;
+            force = force.Clamp(-clampValue, clampValue);
+            //force = new Vector2(force.normalized.x * force.x, force.normalized.y * force.y);
+            Debug.Log("force: " + force);
+            TrajectoryPrediction.Instance.SimulatePhysics(ball_Rigidbody, force);
         }
     }
-
-    //private void FirstProjection(Vector2 direction)
-    //{
-    //    Vector2[] trajectory = Plot(ball_Rigidbody, (Vector2)ball_Transform.position, direction * (distance / Screen.height) * 10f, 500);
-
-    //    lr.positionCount = trajectory.Length;
-    //    Vector3[] positions = new Vector3[trajectory.Length];
-
-
-    //    for (int i = 0; i < positions.Length; i++)
-    //    {
-    //        positions[i] = trajectory[i];
-    //    }
-    //    lr.SetPositions(positions);
-
-    //    Vector2[] Plot(Rigidbody2D rigidbody, Vector2 pos, Vector2 velocity, int steps)
-    //    {
-    //        Vector2[] results = new Vector2[steps];
-
-    //        float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
-    //        Vector2 gravityAccel = Physics2D.gravity * rigidbody.gravityScale * timestep * timestep;
-
-    //        float drag = 1f - timestep * rigidbody.drag;
-    //        Vector2 moveStep = velocity * timestep;
-
-    //        for (int i = 0; i < steps; i++)
-    //        {
-    //            moveStep += gravityAccel;
-    //            moveStep *= drag;
-    //            pos += moveStep;
-    //            results[i] = pos;
-    //        }
-
-    //        return results;
-    //    }
-    //}
-
     private void RotateInDirection2D(Vector2 direction)
     {
         if (direction != Vector2.zero)
@@ -108,11 +53,16 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.TryGetComponent(out ball_Rigidbody) || clicked == true) return;
+
+        GameController.Instance.InvokeOnNewBasketScored(transform);
+
         ball_Rigidbody.simulated = false;
+        ball_Rigidbody.velocity = Vector2.zero;
+        ball_Rigidbody.angularVelocity = 0;
+
         ball_Transform = collision.transform;
         ball_Transform.parent = transform;
         ball_Transform.DOLocalMove(Vector3.zero, ballInBasketMoveTime).SetEase(ballEase);
@@ -121,17 +71,18 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerUp(PointerEventData eventData)
     {
         this.DoAfterTime(.05f, () => clicked = false);
+
         TrajectoryPrediction.Instance.EnableMainPhysics(true);
 
         if (ball_Rigidbody == null || ball_Transform == null) return;
         TrajectoryPrediction.Instance.EnableLineRenderer(false);
-
         Vector2 direction = startPos - endPos;
 
         ball_Rigidbody.simulated = true;
         ball_Transform.parent = null;
-        ball_Rigidbody.AddForce(direction * (distance / Screen.height) * 10f);
-
+        //Vector2 force = direction * (distance / Screen.height) * 10f;
+        //force = force.Clamp(0, Screen.height / forceClamp);
+        ball_Rigidbody.AddForce(force);
         ball_Transform = null;
         ball_Rigidbody = null;
     }
@@ -141,38 +92,10 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         if (ball_Rigidbody == null || ball_Transform == null) return;
 
         startPos = Input.mousePosition;
-
         ball_Rigidbody.simulated = true;
         ball_Transform.parent = null;
         TrajectoryPrediction.Instance.EnableLineRenderer(true);
         TrajectoryPrediction.Instance.EnableMainPhysics(false);
         clicked = true;
     }
-
-    //void SimulatePhysics()
-    //{
-    //    GameObject simulationObject = Instantiate(mainObject);
-    //    GameObject simulationPlane = Instantiate(plane);
-
-    //    SceneManager.MoveGameObjectToScene(simulationObject, parallelScene);
-    //    SceneManager.MoveGameObjectToScene(simulationPlane, parallelScene);
-
-    //    Vector3 direction = startPos - endPos;
-    //    Vector2 force = direction * (distance / Screen.height) * 10f;
-
-    //    Rigidbody2D rigidbody = simulationObject.GetComponent<Rigidbody2D>();
-    //    rigidbody.velocity = ball_Rigidbody.velocity;
-    //    rigidbody.angularVelocity = ball_Rigidbody.angularVelocity;
-    //    rigidbody.simulated = true;
-    //    rigidbody.transform.parent = null;
-    //    rigidbody.AddForce(force);
-
-    //    for (int i = 0; i < lr.positionCount; i++)
-    //    {
-    //        parallelPhysicsScene.Simulate(Time.fixedDeltaTime);
-    //        lr.SetPosition(i, simulationObject.transform.position);
-    //    }
-    //    Destroy(simulationObject);
-    //    Destroy(simulationPlane);
-    //}
 }

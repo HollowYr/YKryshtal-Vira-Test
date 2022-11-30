@@ -8,6 +8,8 @@ public static class Extensions
 
     public static Vector3 Clamp(this Vector3 v, float min, float max) =>
         new Vector3(Mathf.Clamp(v.x, min, max), Mathf.Clamp(v.y, min, max), Mathf.Clamp(v.z, min, max));
+    public static Vector2 Clamp(this Vector2 v, float min, float max) =>
+        new Vector3(Mathf.Clamp(v.x, min, max), Mathf.Clamp(v.y, min, max));
 
     public static Vector3 Abs(this Vector3 v) => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
     public static float GetValueByDirection(this Vector3 v, Vector3 dir)

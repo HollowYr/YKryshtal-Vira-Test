@@ -10,6 +10,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
         get
         {
+
             if (_instance == null)
             {
                 _instance = GameObject.FindObjectOfType<T>();
@@ -23,6 +24,9 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             return _instance;
         }
     }
+
+    
+    
 
     public virtual void Awake()
     {
