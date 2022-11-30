@@ -24,7 +24,7 @@ public class BallController : MonoBehaviour
         {
             endPos = Input.mousePosition;
             distance = Vector2.Distance(startPos, endPos);
-            Debug.Log(/*"Start: " + startPos + " End: " + endPos + */" Distance: " + distance + " Screen%: " + (distance / screenHeight) * 100f);
+            //Debug.Log(/*"Start: " + startPos + " End: " + endPos + */" Distance: " + distance + " Screen%: " + (distance / screenHeight) * 100f);
         }
     }
 }
