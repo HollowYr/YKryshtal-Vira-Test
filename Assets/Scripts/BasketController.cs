@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,8 +21,22 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private Vector2 force;
     private void Start()
     {
-
+        GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
+        Application.quitting += Application_quitting;
     }
+
+    private void Application_quitting()
+    {
+        GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
+    }
+
+    private void Instance_OnNewBasketScored(Transform transform)
+    {
+        if (transform == this.transform) return;
+        GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
+        Destroy(gameObject);
+    }
+
     void Update()
     {
         if (ball_Transform == null || clicked == false) return;
@@ -39,7 +54,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             clampValue = Screen.height / forceClamp;
             force = force.Clamp(-clampValue, clampValue);
             //force = new Vector2(force.normalized.x * force.x, force.normalized.y * force.y);
-            Debug.Log("force: " + force);
+
             TrajectoryPrediction.Instance.SimulatePhysics(ball_Rigidbody, force);
         }
     }
@@ -80,8 +95,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         ball_Rigidbody.simulated = true;
         ball_Transform.parent = null;
-        //Vector2 force = direction * (distance / Screen.height) * 10f;
-        //force = force.Clamp(0, Screen.height / forceClamp);
+
         ball_Rigidbody.AddForce(force);
         ball_Transform = null;
         ball_Rigidbody = null;
@@ -90,6 +104,8 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerDown(PointerEventData eventData)
     {
         if (ball_Rigidbody == null || ball_Transform == null) return;
+
+        if (ball_Transform.position != transform.position) ball_Transform.position = transform.position;
 
         startPos = Input.mousePosition;
         ball_Rigidbody.simulated = true;

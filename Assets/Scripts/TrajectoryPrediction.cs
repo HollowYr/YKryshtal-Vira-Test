@@ -8,14 +8,13 @@ public class TrajectoryPrediction : Singleton<TrajectoryPrediction>
     [SerializeField] private LineRenderer lr;
     [SerializeField] private int trajectoryPointsCount = 100;
     // Trajectory
-    public GameObject mainObject;
-    public GameObject plane;
-    
+    [SerializeField] private GameObject ball;
+    [SerializeField] private GameObject cameraBorders;
+
     private Scene parallelScene;
     private PhysicsScene2D parallelPhysicsScene;
 
     private bool mainPhysics = true;
-    private static float forceClamp = 4f;
 
     void Start()
     {
@@ -39,8 +38,10 @@ public class TrajectoryPrediction : Singleton<TrajectoryPrediction>
 
     public void SimulatePhysics(Rigidbody2D rigidbodyRef, Vector2 force)
     {
-        GameObject simulationObject = Instantiate(mainObject);
-        GameObject simulationPlane = Instantiate(plane);
+        GameObject simulationObject = Instantiate(ball);
+        GameObject simulationPlane = Instantiate(cameraBorders);
+
+        Destroy(simulationObject.GetComponent<BallCollision>());
 
         SceneManager.MoveGameObjectToScene(simulationObject, parallelScene);
         SceneManager.MoveGameObjectToScene(simulationPlane, parallelScene);

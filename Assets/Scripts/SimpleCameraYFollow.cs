@@ -12,16 +12,16 @@ public class SimpleCameraYFollow : MonoBehaviour
     void Start()
     {
         previousLowestPoint = transform.position;
-        GameController.Instance.onNewBasketScored += Instance_onNewBasketScored;
+        GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
         Application.quitting += Application_quitting;
     }
 
     private void Application_quitting()
     {
-        GameController.Instance.onNewBasketScored -= Instance_onNewBasketScored;
+        GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
     }
 
-    private void Instance_onNewBasketScored(Transform transform)
+    private void Instance_OnNewBasketScored(Transform transform)
     {
         previousLowestPoint = this.transform.position;
     }
