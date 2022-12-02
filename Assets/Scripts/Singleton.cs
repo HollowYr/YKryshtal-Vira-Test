@@ -25,12 +25,12 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
 
-    
-    
+
+
 
     public virtual void Awake()
     {
-        if(_instance!= null)
+        if (_instance != null)
         {
             Destroy(gameObject);
             return;
@@ -40,5 +40,5 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         if (_instance == null) return;
-    } 
+    }
 }

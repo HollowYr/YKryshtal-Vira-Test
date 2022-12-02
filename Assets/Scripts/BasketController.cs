@@ -53,7 +53,6 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             force = direction * (distance / Screen.height) * 2f;
             clampValue = Screen.height / forceClamp;
             force = force.Clamp(-clampValue, clampValue);
-            //force = new Vector2(force.normalized.x * force.x, force.normalized.y * force.y);
 
             TrajectoryPrediction.Instance.SimulatePhysics(ball_Rigidbody, force);
         }
@@ -80,7 +79,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         ball_Transform = collision.transform;
         ball_Transform.parent = transform;
-        ball_Transform.DOLocalMove(Vector3.zero, ballInBasketMoveTime).SetEase(ballEase);
+        ball_Transform.DOMove(transform.position, ballInBasketMoveTime).SetEase(ballEase);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -105,7 +104,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (ball_Rigidbody == null || ball_Transform == null) return;
 
-        if (ball_Transform.position != transform.position) ball_Transform.position = transform.position;
+        //if (ball_Transform.position != transform.position) ball_Transform.position = transform.position;
 
         startPos = Input.mousePosition;
         ball_Rigidbody.simulated = true;

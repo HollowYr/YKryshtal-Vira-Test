@@ -27,12 +27,15 @@ public class BasketsSpawner : MonoBehaviour
 
     private void Instance_OnNewBasketScored(Transform obj)
     {
-        Debug.Log("Scored");
-
         Vector3 position = (obj.position.x > 0) ? LeftBasket : RightBasket;
         position = camera.TransformPoint(position);
         position.y = obj.position.y + Mathf.Abs(LeftBasket.y - RightBasket.y);
         position.z = 0;
+
         GameObject basket = Instantiate(basketToSpawn, position, Quaternion.identity, transform);
+        BasketVariations basketVariation = basket.GetComponent<BasketVariations>();
+        float random = Random.Range(0, 100);
+        if (random < 30f) basketVariation.AddStar();
+        Debug.Log("random num: " + random);
     }
 }
