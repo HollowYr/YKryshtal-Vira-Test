@@ -16,15 +16,27 @@ public class TrajectoryPrediction : Singleton<TrajectoryPrediction>
 
     private bool mainPhysics = true;
 
+    public void SetBall(GameObject ball) => this.ball = ball;
+    public void SetCameraBorders(GameObject cameraBorders) => this.cameraBorders = cameraBorders;
     void Start()
     {
-        Physics2D.simulationMode = SimulationMode2D.Script;
         lr.positionCount = trajectoryPointsCount;
 
+        Physics2D.simulationMode = SimulationMode2D.Script;
+        CreateParallelScene();
+    }
+
+    public void CreateParallelScene()
+    {
         CreateSceneParameters createSceneParameters = new CreateSceneParameters(LocalPhysicsMode.Physics2D);
-        parallelScene = SceneManager.CreateScene("ParallelScene", createSceneParameters);
+        if (SceneManager.GetSceneByName("ParallelScene").IsValid())
+            parallelScene = SceneManager.GetSceneByName("ParallelScene");
+        else
+            parallelScene = SceneManager.CreateScene("ParallelScene", createSceneParameters);
         parallelPhysicsScene = parallelScene.GetPhysicsScene2D();
     }
+
+
 
     public void EnableMainPhysics(bool isEnabled) => mainPhysics = isEnabled;
     public void EnableLineRenderer(bool isEnabled) => lr.enabled = isEnabled;
@@ -41,8 +53,9 @@ public class TrajectoryPrediction : Singleton<TrajectoryPrediction>
         GameObject simulationObject = Instantiate(ball);
         GameObject simulationPlane = Instantiate(cameraBorders);
 
-        Destroy(simulationObject.GetComponent<BallCollision>());
-
+        if (simulationObject.TryGetComponent(out BallCollision ballCOl))
+            DestroyImmediate(ballCOl);
+        //Debug.Log("After deleting" + ballCOl != null);
         SceneManager.MoveGameObjectToScene(simulationObject, parallelScene);
         SceneManager.MoveGameObjectToScene(simulationPlane, parallelScene);
 

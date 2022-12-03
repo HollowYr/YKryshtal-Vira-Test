@@ -6,6 +6,7 @@ public class BasketsSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject basketToSpawn;
     [SerializeField] private Transform camera;
+    [SerializeField] private Transform leftBasketTransform;
     Vector3 LeftBasket;
     Vector3 RightBasket;
 
@@ -13,11 +14,19 @@ public class BasketsSpawner : MonoBehaviour
     {
         GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
         Application.quitting += Application_quitting;
+
         foreach (Transform item in transform)
         {
-            if (item.position.x < 0) LeftBasket = camera.InverseTransformPoint(item.position);
+            if (item.position.x < 0)
+            {
+                LeftBasket = camera.InverseTransformPoint(item.position);
+
+            }
+
             if (item.position.x > 0) RightBasket = camera.InverseTransformPoint(item.position);
         }
+
+        GameController.Instance.SetBasketHashCode(leftBasketTransform.GetHashCode());
     }
 
     private void Application_quitting()

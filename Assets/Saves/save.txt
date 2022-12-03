@@ -1,1 +1,1 @@
-{"score":12,"stars":2,"isLightTheme":true}
+{"highestScore":8,"stars":32,"isLightTheme":true}

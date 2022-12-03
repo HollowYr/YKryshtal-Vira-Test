@@ -5,26 +5,31 @@ using UnityEngine;
 
 public class GameData : Singleton<GameData>
 {
+    private int highestScore = 0;
     private int score = 0;
     private int stars = 0;
     private bool isLightTheme = true;
     // Start is called before the first frame update
     void Start()
     {
+        Load();
         Application.quitting += Application_quitting;
         GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
         SaveSystem.Init();
+        RefreshStarsCount();
     }
-    private void Update()
+
+    public void Resubscribe()
     {
-        if (Input.GetKeyDown(KeyCode.W)) Save();
-        if (Input.GetKeyDown(KeyCode.E)) Load();
+        Application.quitting += Application_quitting;
+        GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
     }
+
     public void Save()
     {
         SaveData saveData = new SaveData
         {
-            score = score,
+            highestScore = highestScore,
             stars = stars,
             isLightTheme = isLightTheme
         };
@@ -34,10 +39,11 @@ public class GameData : Singleton<GameData>
     public void Load()
     {
         SaveData data = JsonUtility.FromJson<SaveData>(SaveSystem.Load());
-        score = data.score;
+        highestScore = data.highestScore;
         stars = data.stars;
         isLightTheme = data.isLightTheme;
         RefreshStarsCount();
+        score = 0;
         RefreshScoreCount();
     }
 
@@ -47,6 +53,8 @@ public class GameData : Singleton<GameData>
         RefreshStarsCount();
     }
 
+    public int GetHighestScore() => highestScore;
+
     private void RefreshStarsCount()
     {
         MainUI.Instance.scoreUI.SetStarText(stars);
@@ -54,12 +62,16 @@ public class GameData : Singleton<GameData>
 
     private void Application_quitting()
     {
+        Save();
         GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
     }
 
     private void Instance_OnNewBasketScored(Transform obj)
     {
+
+        Debug.Log("adding score");
         score += 1;
+        if (score > highestScore) highestScore = score;
         //Debug.Log("Score: " + score);
         RefreshScoreCount();
         //throw new System.NotImplementedException();
@@ -67,12 +79,13 @@ public class GameData : Singleton<GameData>
 
     private void RefreshScoreCount()
     {
+
         MainUI.Instance.scoreUI.SetScoreText(score);
     }
 
     private class SaveData
     {
-        public int score;
+        public int highestScore;
         public int stars;
         public bool isLightTheme;
     }

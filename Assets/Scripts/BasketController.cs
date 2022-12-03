@@ -23,6 +23,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
         Application.quitting += Application_quitting;
+        //GameController.Instance.OnFail += Application_quitting;
     }
 
     private void Application_quitting()
@@ -32,7 +33,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void Instance_OnNewBasketScored(Transform transform)
     {
-        if (transform == this.transform) return;
+        if (gameObject == null || transform == this.transform) return;
         GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
         Destroy(gameObject);
     }

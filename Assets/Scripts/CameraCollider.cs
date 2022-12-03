@@ -13,6 +13,7 @@ public class CameraCollider : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        TrajectoryPrediction.Instance.SetCameraBorders(gameObject);
         camera = GetComponent<Camera>();
 
         sizeY = camera.orthographicSize * 2;
