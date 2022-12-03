@@ -77,7 +77,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         if (!collision.TryGetComponent(out ball_Rigidbody) || clicked == true) return;
 
         gameController.InvokeOnNewBasketScored(transform);
-
+        AudioManager.Instance.Play("Hit");
         ball_Rigidbody.simulated = false;
         ball_Rigidbody.velocity = Vector2.zero;
         ball_Rigidbody.angularVelocity = 0;

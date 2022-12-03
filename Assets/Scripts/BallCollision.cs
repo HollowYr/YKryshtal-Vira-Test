@@ -10,6 +10,7 @@ public class BallCollision : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        AudioManager.Instance.Play("Bounce");
         Debug.Log(collision.transform.name);
     }
 
