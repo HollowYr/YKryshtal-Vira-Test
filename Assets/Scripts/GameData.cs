@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using UnityEditor;
 using UnityEngine;
 
@@ -53,6 +54,13 @@ public class GameData : Singleton<GameData>
         RefreshStarsCount();
     }
 
+    public bool IsLightTheme() => isLightTheme;
+    public void SetThemeColor(bool isLightTheme)
+    {
+        GameController.Instance.InvokeOnBackgroundChange(isLightTheme);
+        this.isLightTheme = isLightTheme;
+    }
+
     public int GetHighestScore() => highestScore;
 
     private void RefreshStarsCount()
@@ -68,13 +76,9 @@ public class GameData : Singleton<GameData>
 
     private void Instance_OnNewBasketScored(Transform obj)
     {
-
-        Debug.Log("adding score");
         score += 1;
         if (score > highestScore) highestScore = score;
-        //Debug.Log("Score: " + score);
         RefreshScoreCount();
-        //throw new System.NotImplementedException();
     }
 
     private void RefreshScoreCount()

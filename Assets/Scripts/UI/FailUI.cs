@@ -7,22 +7,20 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class FailUI : MonoBehaviour
+public class FailUI : UI
 {
     [SerializeField] private TextMeshProUGUI highestScore;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button settingsButton;
-    private CanvasGroup canvasGroup;
 
     private void Awake()
     {
         MainUI.Instance.failUI = this;
     }
-    private void Start()
+    public override void Start()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
+        base.Start();
         restartButton.onClick.AddListener(Restart);
-        //settingsButton.onClick.AddListener();
         Hide();
     }
 
@@ -31,15 +29,9 @@ public class FailUI : MonoBehaviour
         GameController.Instance.ReloadScene();
     }
 
-    public void Show()
+    public override void Show()
     {
         highestScore.text = GameData.Instance.GetHighestScore().ToString();
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.alpha = 1;
-    }
-    public void Hide()
-    {
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0;
+        base.Show();
     }
 }

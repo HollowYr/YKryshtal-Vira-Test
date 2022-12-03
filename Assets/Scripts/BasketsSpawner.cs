@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BasketsSpawner : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class BasketsSpawner : MonoBehaviour
 
     void Start()
     {
+        GameController.Instance.basketsSortingLayer = GetComponent<SortingGroup>();
         GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
         Application.quitting += Application_quitting;
 
@@ -45,6 +47,5 @@ public class BasketsSpawner : MonoBehaviour
         BasketVariations basketVariation = basket.GetComponent<BasketVariations>();
         float random = Random.Range(0, 100);
         if (random < 30f) basketVariation.AddStar();
-        Debug.Log("random num: " + random);
     }
 }

@@ -10,7 +10,9 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 {
     [SerializeField] private float ballInBasketMoveTime = .5f;
     [SerializeField] private Ease ballEase = Ease.OutBack;
+    [SerializeField] private Transform ballPosition;
 
+    private GameController gameController;
     private Rigidbody2D ball_Rigidbody;
     private Transform ball_Transform;
     private Vector2 startPos, endPos;
@@ -21,20 +23,21 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private Vector2 force;
     private void Start()
     {
-        GameController.Instance.OnNewBasketScored += Instance_OnNewBasketScored;
+        gameController = GameController.Instance;
+        gameController.OnNewBasketScored += Instance_OnNewBasketScored;
         Application.quitting += Application_quitting;
         //GameController.Instance.OnFail += Application_quitting;
     }
 
     private void Application_quitting()
     {
-        GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
+        gameController.OnNewBasketScored -= Instance_OnNewBasketScored;
     }
 
     private void Instance_OnNewBasketScored(Transform transform)
     {
         if (gameObject == null || transform == this.transform) return;
-        GameController.Instance.OnNewBasketScored -= Instance_OnNewBasketScored;
+        gameController.OnNewBasketScored -= Instance_OnNewBasketScored;
         Destroy(gameObject);
     }
 
@@ -54,6 +57,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             force = direction * (distance / Screen.height) * 2f;
             clampValue = Screen.height / forceClamp;
             force = force.Clamp(-clampValue, clampValue);
+            ball_Transform.position = ballPosition.position;
 
             TrajectoryPrediction.Instance.SimulatePhysics(ball_Rigidbody, force);
         }
@@ -72,7 +76,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (!collision.TryGetComponent(out ball_Rigidbody) || clicked == true) return;
 
-        GameController.Instance.InvokeOnNewBasketScored(transform);
+        gameController.InvokeOnNewBasketScored(transform);
 
         ball_Rigidbody.simulated = false;
         ball_Rigidbody.velocity = Vector2.zero;
@@ -80,7 +84,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         ball_Transform = collision.transform;
         ball_Transform.parent = transform;
-        ball_Transform.DOMove(transform.position, ballInBasketMoveTime).SetEase(ballEase);
+        ball_Transform.DOMove(ballPosition.position, ballInBasketMoveTime).SetEase(ballEase);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -103,7 +107,7 @@ public class BasketController : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (ball_Rigidbody == null || ball_Transform == null) return;
+        if (ball_Rigidbody == null || ball_Transform == null || gameController.isPlayable == false) return;
 
         //if (ball_Transform.position != transform.position) ball_Transform.position = transform.position;
 
